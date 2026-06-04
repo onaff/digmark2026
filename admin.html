@@ -18,7 +18,7 @@
     <nav class="navbar navbar-dark bg-baznas shadow-sm mb-4">
         <div class="container-fluid">
             <span class="navbar-brand mb-0 h1">
-                <i class="fa-solid fa-chart-line me-2"></i>Dashboard Admin Pendaftaran BAZNAS Salatiga
+                <i class="fa-solid fa-chart-line me-2"></i>Dashboard Admin | Pendaftaran Pelatihan Digital Marketing 10 Juni 2026
             </span>
             <button class="btn btn-light btn-sm" onclick="muatData()"><i class="fa-solid fa-sync me-1"></i> Refresh Data</button>
         </div>
@@ -28,7 +28,7 @@
         
         <div id="loading" class="text-center py-5">
             <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
-            <h5>Mengambil data...</h5>
+            <h5>Mengambil data dari Google Sheets...</h5>
         </div>
 
         <div id="mainContent" class="d-none">
@@ -60,7 +60,7 @@
                     <div class="card card-stat shadow-sm p-3 border-info">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h6 class="text-muted text-uppercase small">Peserta ZMart</h6>
+                                <h6 class="text-muted text-uppercase small">ZMart</h6>
                                 <h3 class="fw-bold mb-0 text-info" id="statZmart">0</h3>
                             </div>
                             <div class="fs-1 text-info"><i class="fa-solid fa-shop"></i></div>
@@ -100,7 +100,6 @@
                             <thead class="table-light text-secondary">
                                 <tr>
                                     <th>No</th>
-                                    <th>Waktu Daftar</th>
                                     <th>Nama</th>
                                     <th>Kecamatan</th>
                                     <th>Kelurahan</th>
@@ -125,7 +124,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        // PENTING: Ganti URL di bawah ini dengan URL Web App dari Langkah 1 (admin_script)
+        // PENTING: Ganti URL di bawah ini dengan URL Web App dari admin_script.gs Anda
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwz9Jxk_dRaxm_EPqQNy6tBx9TNx-b4nEDK_BEGxTHCEasNuz2Ia_7QHpktgp05xhFH/exec';
         
         let masterData = [];
@@ -135,29 +134,25 @@
             muatData();
         });
 
-        // REVISI TOTAL: Menggunakan metode JSONP (Script Injection) untuk memotong semua blokade CORS browser
         function muatData() {
             document.getElementById('loading').classList.remove('d-none');
             document.getElementById('mainContent').classList.add('d-none');
 
-            // Hapus callback lama jika ada
             const oldScript = document.getElementById('jsonpScript');
             if (oldScript) oldScript.remove();
 
-            // Buat elemen script baru untuk meminta data ke Google
             const script = document.createElement('script');
             script.id = 'jsonpScript';
             script.src = `${scriptURL}?callback=prosesDataAdmin`;
             
             script.onerror = function() {
-                alert("Gagal memuat data! Periksa apakah URL Web App Admin sudah benar dan sudah di-deploy sebagai 'Anyone'.");
+                alert("Gagal memuat data! Periksa apakah URL Web App Admin sudah benar.");
                 document.getElementById('loading').classList.add('d-none');
             };
 
             document.body.appendChild(script);
         }
 
-        // Fungsi penangkap data hasil lemparan JSONP
         function prosesDataAdmin(data) {
             if (data.error) {
                 alert("Error dari skrip Google: " + data.error);
@@ -176,7 +171,7 @@
             tbody.innerHTML = '';
 
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-4">Belum ada data pendaftar yang masuk di Google Sheet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">Belum ada data pendaftar yang masuk di Google Sheet.</td></tr>';
                 return;
             }
 
@@ -201,9 +196,9 @@
 
                 let cleanWA = item.nohp.replace(/[^0-9]/g, '');
 
+                // Kolom timestamp telah dihapus dari struktur baris tabel <tr>
                 let row = `<tr>
                     <td>${index + 1}</td>
-                    <td class="text-muted small">${item.timestamp}</td>
                     <td class="fw-bold">${item.nama}</td>
                     <td><span class="badge bg-secondary">${item.kecamatan}</span></td>
                     <td>${item.kelurahan}</td>
