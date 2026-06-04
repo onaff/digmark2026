@@ -18,7 +18,7 @@
     <nav class="navbar navbar-dark bg-baznas shadow-sm mb-4">
         <div class="container-fluid">
             <span class="navbar-brand mb-0 h1">
-                <i class="fa-solid fa-chart-line me-2"></i>Dashboard Admin | Pendaftaran Pelatihan Digital Marketing 10 Juni 2026
+                <i class="fa-solid fa-chart-line me-2"></i>Dashboard Admin
             </span>
             <button class="btn btn-light btn-sm" onclick="muatData()"><i class="fa-solid fa-sync me-1"></i> Refresh Data</button>
         </div>
@@ -28,7 +28,7 @@
         
         <div id="loading" class="text-center py-5">
             <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
-            <h5>Mengambil data dari Google Sheets...</h5>
+            <h5>Mengambil data...</h5>
         </div>
 
         <div id="mainContent" class="d-none">
@@ -88,10 +88,15 @@
 
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
-                    <h5 class="mb-0 fw-bold text-secondary"><i class="fa-solid fa-list me-1"></i> Data Lengkap Pendaftar</h5>
-                    <div class="input-group" style="max-width: 350px;">
-                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
-                        <input type="text" id="inputCari" class="form-control bg-light border-start-0" placeholder="Cari data...">
+                    <h5 class="mb-0 fw-bold text-secondary"><i class="fa-solid fa-list me-1"></i> Data Lengkap Calon Peserta</h5>
+                    <div class="d-flex gap-2 w-100 justify-content-md-end" style="max-width: 500px;">
+                        <button class="btn btn-success text-nowrap" onclick="exportKeExcel()">
+                            <i class="fa-solid fa-file-excel me-1"></i> Export ke Excel
+                        </button>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                            <input type="text" id="inputCari" class="form-control bg-light border-start-0" placeholder="Cari data...">
+                        </div>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -112,7 +117,7 @@
                                 </tr>
                             </thead>
                             <tbody id="dataTabel">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -122,9 +127,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
     <script>
-        // PENTING: Ganti URL di bawah ini dengan URL Web App dari admin_script.gs Anda
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwz9Jxk_dRaxm_EPqQNy6tBx9TNx-b4nEDK_BEGxTHCEasNuz2Ia_7QHpktgp05xhFH/exec';
         
         let masterData = [];
@@ -196,7 +201,6 @@
 
                 let cleanWA = item.nohp.replace(/[^0-9]/g, '');
 
-                // Kolom timestamp telah dihapus dari struktur baris tabel <tr>
                 let row = `<tr>
                     <td>${index + 1}</td>
                     <td class="fw-bold">${item.nama}</td>
@@ -268,6 +272,136 @@
                 }
             });
         });
+
+        // PERUBAHAN UTAMA: Logika Format Excel Profesional (Border Garis, Judul, Perataan Tengah)
+        function exportKeExcel() {
+            if (masterData.length === 0) {
+                alert("Tidak ada data untuk di-export!");
+                return;
+            }
+
+            // 1. Penyusunan teks baris judul, tanggal, dan kolom header rekap
+            const barisJudul1 = ["PESERTA PELATIHAN DIGITAL MARKETING"];
+            const barisJudul2 = ["10 Juni 2026"];
+            const barisKosong = [""];
+            const headerKolom = ["No", "Nama", "Kecamatan", "Kelurahan", "Alamat Detail", "Usia", "No HP", "Email", "Kategori", "Facebook", "Instagram", "TikTok", "Sosmed Lainnya"];
+
+            const rowsData = [
+                barisJudul1,
+                barisJudul2,
+                barisKosong,
+                headerKolom
+            ];
+
+            masterData.forEach((item, index) => {
+                rowsData.push([
+                    index + 1,
+                    item.nama,
+                    item.kecamatan,
+                    item.kelurahan,
+                    item.alamat,
+                    item.usia + " Thn",
+                    item.nohp,
+                    item.email,
+                    item.kategori,
+                    item.facebook,
+                    item.instagram,
+                    item.tiktok,
+                    item.sosmed_lain
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(rowsData);
+
+            // Penggabungan (Merge) kolom judul dari A s.d M (index 0 - 12) agar bisa center sempurna
+            ws['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 12 } }, 
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 12 } }  
+            ];
+
+            // Definisi garis tepi (Border Thin) abu-abu halus untuk tabel agar rapi
+            const borderGarisTabel = {
+                top: { style: "thin", color: { rgb: "D3D3D3" } },
+                bottom: { style: "thin", color: { rgb: "D3D3D3" } },
+                left: { style: "thin", color: { rgb: "D3D3D3" } },
+                right: { style: "thin", color: { rgb: "D3D3D3" } }
+            };
+
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const cell_address = { r: R, c: C };
+                    const cell_ref = XLSX.utils.encode_cell(cell_address);
+                    
+                    // Mengantisipasi sel kosong di area tabel agar border tetap tercetak utuh
+                    if (!ws[cell_ref]) {
+                        if (R >= 3) ws[cell_ref] = { t: 's', v: '' };
+                        else continue;
+                    }
+                    if (!ws[cell_ref].s) ws[cell_ref].s = {};
+
+                    // A. Format Baris Judul 1 (Utama)
+                    if (R === 0) {
+                        ws[cell_ref].s.font = { name: "Segoe UI", size: 14, bold: true, color: { rgb: "0B6623" } };
+                        ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
+                        continue;
+                    }
+                    // B. Format Baris Judul 2 (Tanggal)
+                    if (R === 1) {
+                        ws[cell_ref].s.font = { name: "Segoe UI", size: 11, italic: true, color: { rgb: "555555" } };
+                        ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
+                        continue;
+                    }
+                    if (R === 2) continue; // Lewati baris spasi kosong
+
+                    // C. Format Header Kolom Tabel (Baris Index ke-3)
+                    if (R === 3) {
+                        ws[cell_ref].s.font = { name: "Segoe UI", size: 11, bold: true, color: { rgb: "FFFFFF" } };
+                        ws[cell_ref].s.fill = { type: "pattern", pattern: "solid", fgColor: { rgb: "0B6623" } }; // Latar Hijau BAZNAS
+                        ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
+                        ws[cell_ref].s.border = borderGarisTabel;
+                    } 
+                    // D. Format Seluruh Baris Isi Data (Baris Index ke-4 ke atas)
+                    else if (R >= 4) {
+                        ws[cell_ref].s.font = { name: "Segoe UI", size: 10 };
+                        ws[cell_ref].s.border = borderGarisTabel;
+                        
+                        // Pengaturan Perataan Isi Tabel (Beberapa kolom center, sisanya left agar rapi)
+                        if (C === 0 || C === 5 || C === 6 || C === 8) {
+                            ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" }; // No, Usia, No HP, Kategori
+                        } else {
+                            ws[cell_ref].s.alignment = { horizontal: "left", vertical: "center" }; // Nama, Alamat, Sosmed, Kelurahan
+                        }
+
+                        // Zebra Striping dekoratif: mewarnai baris selang-seling secara halus
+                        if (R % 2 === 1) {
+                            ws[cell_ref].s.fill = { type: "pattern", pattern: "solid", fgColor: { rgb: "F9F9F9" } };
+                        }
+                    }
+                }
+            }
+
+            // Memaksa Excel bawaan untuk menampilkan Gridlines lembar kerja
+            ws['!views'] = [{ showGridLines: true }];
+
+            // Otomatisasi pengaturan lebar kolom (Auto-fit) + padding 4 karakter agar teks tidak terpotong garis
+            const colWidths = headerKolom.map((header, colIndex) => {
+                let maxLen = header.length;
+                for (let rowIndex = 4; rowIndex < rowsData.length; rowIndex++) {
+                    const val = rowsData[rowIndex][colIndex];
+                    if (val !== undefined && val !== null) {
+                        const len = val.toString().length;
+                        if (len > maxLen) maxLen = len;
+                    }
+                }
+                return { wch: maxLen + 4 };
+            });
+            ws['!cols'] = colWidths;
+
+            XLSX.utils.book_append_sheet(wb, ws, "Data Peserta");
+            XLSX.writeFile(wb, "Rekap_Peserta_Digital_Marketing_BAZNAS.xlsx");
+        }
     </script>
 </body>
 </html>
