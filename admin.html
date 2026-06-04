@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - BAZNAS Kota Salatiga</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
+        .bg-baznas { background-color: #0b6623; color: white; }
+        .card-stat { border-left: 4px solid #0b6623; }
+        .table-responsive { max-height: 500px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark bg-baznas shadow-sm mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="fa-solid fa-chart-line me-2"></i>Dashboard Admin Pendaftaran BAZNAS Salatiga
+            </span>
+            <button class="btn btn-light btn-sm" onclick="muatData()"><i class="fa-solid fa-sync me-1"></i> Refresh Data</button>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4 mb-5">
+        
+        <div id="loading" class="text-center py-5">
+            <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+            <h5>Mengambil data dari Google Sheets BAZNAS...</h5>
+        </div>
+
+        <div id="mainContent" class="d-none">
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card card-stat shadow-sm p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-muted text-uppercase small">Total Pendaftar</h6>
+                                <h3 class="fw-bold mb-0" id="statTotal">0</h3>
+                            </div>
+                            <div class="fs-1 text-success"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-stat shadow-sm p-3 border-warning">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-muted text-uppercase small">UMKM Binaan</h6>
+                                <h3 class="fw-bold mb-0 text-warning" id="statUmkm">0</h3>
+                            </div>
+                            <div class="fs-1 text-warning"><i class="fa-solid fa-store"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-stat shadow-sm p-3 border-info">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-muted text-uppercase small">Peserta ZMart</h6>
+                                <h3 class="fw-bold mb-0 text-info" id="statZmart">0</h3>
+                            </div>
+                            <div class="fs-1 text-info"><i class="fa-solid fa-shop"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 p-3 h-100">
+                        <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-pie-chart me-1"></i> Proporsi Kategori Program</h6>
+                        <div style="max-height: 250px;" class="d-flex justify-content-center">
+                            <canvas id="chartKategori"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 p-3 h-100">
+                        <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-map-location-dot me-1"></i> Sebaran Per Kecamatan</h6>
+                        <canvas id="chartKecamatan"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <h5 class="mb-0 fw-bold text-secondary"><i class="fa-solid fa-list me-1"></i> Data Lengkap Pendaftar</h5>
+                    <div class="input-group" style="max-width: 350px;">
+                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                        <input type="text" id="inputCari" class="form-control bg-light border-start-0" placeholder="Cari data...">
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light text-secondary">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Waktu Daftar</th>
+                                    <th>Nama</th>
+                                    <th>Kecamatan</th>
+                                    <th>Kelurahan</th>
+                                    <th>Alamat Detail</th>
+                                    <th>Usia</th>
+                                    <th>No HP</th>
+                                    <th>Email</th>
+                                    <th>Kategori</th>
+                                    <th>Sosmed</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTabel">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // PENTING: Ganti URL di bawah ini dengan URL Web App dari Langkah 1 (admin_script)
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwz9Jxk_dRaxm_EPqQNy6tBx9TNx-b4nEDK_BEGxTHCEasNuz2Ia_7QHpktgp05xhFH/exec';
+        
+        let masterData = [];
+        let chart1, chart2;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            muatData();
+        });
+
+        // REVISI TOTAL: Menggunakan metode JSONP (Script Injection) untuk memotong semua blokade CORS browser
+        function muatData() {
+            document.getElementById('loading').classList.remove('d-none');
+            document.getElementById('mainContent').classList.add('d-none');
+
+            // Hapus callback lama jika ada
+            const oldScript = document.getElementById('jsonpScript');
+            if (oldScript) oldScript.remove();
+
+            // Buat elemen script baru untuk meminta data ke Google
+            const script = document.createElement('script');
+            script.id = 'jsonpScript';
+            script.src = `${scriptURL}?callback=prosesDataAdmin`;
+            
+            script.onerror = function() {
+                alert("Gagal memuat data! Periksa apakah URL Web App Admin sudah benar dan sudah di-deploy sebagai 'Anyone'.");
+                document.getElementById('loading').classList.add('d-none');
+            };
+
+            document.body.appendChild(script);
+        }
+
+        // Fungsi penangkap data hasil lemparan JSONP
+        function prosesDataAdmin(data) {
+            if (data.error) {
+                alert("Error dari skrip Google: " + data.error);
+                document.getElementById('loading').classList.add('d-none');
+                return;
+            }
+            masterData = data;
+            renderDashboard(data);
+            
+            document.getElementById('loading').classList.add('d-none');
+            document.getElementById('mainContent').classList.remove('d-none');
+        }
+
+        function renderDashboard(data) {
+            const tbody = document.getElementById('dataTabel');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-4">Belum ada data pendaftar yang masuk di Google Sheet.</td></tr>';
+                return;
+            }
+
+            let countUmkm = 0;
+            let countZmart = 0;
+            let kecamatanCounts = { "Argomulyo": 0, "Sidomukti": 0, "Sidorejo": 0, "Tingkir": 0 };
+
+            data.forEach((item, index) => {
+                if(item.kategori === 'UMKM Binaan') countUmkm++;
+                if(item.kategori === 'ZMart') countZmart++;
+                
+                if (kecamatanCounts[item.kecamatan] !== undefined) {
+                    kecamatanCounts[item.kecamatan]++;
+                }
+
+                let sosmedBadge = `<small>
+                    FB: ${item.facebook}<br>
+                    IG: ${item.instagram}<br>
+                    TT: ${item.tiktok}<br>
+                    Lain: ${item.sosmed_lain}
+                </small>`;
+
+                let cleanWA = item.nohp.replace(/[^0-9]/g, '');
+
+                let row = `<tr>
+                    <td>${index + 1}</td>
+                    <td class="text-muted small">${item.timestamp}</td>
+                    <td class="fw-bold">${item.nama}</td>
+                    <td><span class="badge bg-secondary">${item.kecamatan}</span></td>
+                    <td>${item.kelurahan}</td>
+                    <td class="small text-wrap" style="max-width: 200px;">${item.alamat}</td>
+                    <td>${item.usia} Thn</td>
+                    <td><a href="https://wa.me/${cleanWA}" target="_blank" class="text-decoration-none"><i class="fa-brands fa-whatsapp text-success me-1"></i>${item.nohp}</a></td>
+                    <td class="small">${item.email}</td>
+                    <td><span class="badge ${item.kategori === 'UMKM Binaan' ? 'bg-warning text-dark' : 'bg-info text-dark'}">${item.kategori}</span></td>
+                    <td>${sosmedBadge}</td>
+                </tr>`;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+
+            document.getElementById('statTotal').innerText = data.length;
+            document.getElementById('statUmkm').innerText = countUmkm;
+            document.getElementById('statZmart').innerText = countZmart;
+
+            buildCharts(countUmkm, countZmart, data.length - (countUmkm + countZmart), kecamatanCounts);
+        }
+
+        function buildCharts(umkm, zmart, umum, kecData) {
+            if(chart1) chart1.destroy();
+            if(chart2) chart2.destroy();
+
+            const ctxKat = document.getElementById('chartKategori').getContext('2d');
+            chart1 = new Chart(ctxKat, {
+                type: 'pie',
+                data: {
+                    labels: ['UMKM Binaan', 'ZMart', 'Umum/Lainnya'],
+                    datasets: [{
+                        data: [umkm, zmart, umum],
+                        backgroundColor: ['#ffc107', '#0dcaf0', '#6c757d']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctxKec = document.getElementById('chartKecamatan').getContext('2d');
+            chart2 = new Chart(ctxKec, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(kecData),
+                    datasets: [{
+                        label: 'Jumlah Peserta',
+                        data: Object.values(kecData),
+                        backgroundColor: '#0b6623'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+        }
+
+        // Live Search
+        document.getElementById('inputCari').addEventListener('keyup', function() {
+            let filter = this.value.toLowerCase();
+            let rows = document.querySelectorAll('#dataTabel tr');
+
+            rows.forEach(row => {
+                let text = row.textContent.toLowerCase();
+                if(text.includes(filter)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
