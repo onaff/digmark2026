@@ -57,7 +57,7 @@
                 <div class="card shadow border-0 rounded-3">
                     <div class="card-header card-header-baznas text-center py-3">
                         <h4 class="mb-1 fw-bold">Formulir Pendaftaran Pelatihan Digital Marketing</h4>
-                        <p class="mb-0 text-white-50">Penguatan Sumber Daya Pelaku Usaha Ekonomi Produktif (UMKM)</p>
+                        <p class="mb-0 text-white-50">PENINGKATAN KAPASITAS SUMBER DAYA PELAKU USAHA EKONOMI PRODUKTIF / UMKM</p>
                     </div>
                     <div class="card-body p-4">
                         
@@ -104,7 +104,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="usia" class="form-label fw-semibold text-secondary">Usia (Tahun)</label>
-                                    <input type="number" class="form-control py-2" id="usia" required min="15" max="60" placeholder="Contoh: 23">
+                                    <input type="number" class="form-control py-2" id="usia" required min="17" max="65" placeholder="Contoh: 23">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="nohp" class="form-label fw-semibold text-secondary">No. HP / WhatsApp (Aktif)</label>
@@ -120,7 +120,7 @@
                             <div class="mb-3">
                                 <label for="kategori" class="form-label fw-semibold text-secondary">Kategori Peserta / Program</label>
                                 <select class="form-select py-2" id="kategori" required>
-                                    <option value="" disabled selected>-- Pilih Kategori --</option>
+                                    <option value="" disabled selected>-- Pilih Kategori Program --</option>
                                     <option value="UMKM Binaan">UMKM Binaan BAZNAS</option>
                                     <option value="ZMart">ZMart</option>
                                     <option value="UPZ">Jamaah Masjid/UPZ</option>
@@ -219,7 +219,7 @@
 
     <script>
         // PENTING: Ganti tulisan di bawah ini dengan URL Web App dari Google Apps Script Anda yang baru
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwz9Jxk_dRaxm_EPqQNy6tBx9TNx-b4nEDK_BEGxTHCEasNuz2Ia_7QHpktgp05xhFH/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwOjtVE7RXNkwmrVbNohzXjgpSzhL2yU0X2Vg81y8ZvkSASo9bXqO8dq7TX94UcBuhI/exec';
         
         const form = document.getElementById('pendaftaranForm');
         const btnSubmit = document.getElementById('btnSubmit');
@@ -271,11 +271,43 @@
                 if (item.cb.checked) {
                     item.input.disabled = false;
                     item.input.required = true;
+                    
+                    // MODIFIKASI: Berlaku untuk Instagram (ig) dan TikTok (tt)
+                    if (key === 'ig' || key === 'tt') {
+                        if (!item.input.value.startsWith('@')) {
+                            item.input.value = '@' + item.input.value;
+                        }
+                    }
+                    
                     item.input.focus();
                 } else {
                     item.input.disabled = true;
                     item.input.required = false;
                     item.input.value = '';
+                }
+            });
+        });
+
+        // MODIFIKASI: Terapkan logika pengetikan dan proteksi '@' pada Instagram & TikTok
+        const targetedInputs = [sosmedConfig.ig.input, sosmedConfig.tt.input];
+
+        targetedInputs.forEach(inputEl => {
+            inputEl.addEventListener('input', function() {
+                if (!this.value.startsWith('@')) {
+                    if (this.value.length === 0) {
+                        this.value = '@';
+                    } else {
+                        this.value = '@' + this.value.replace(/@/g, '');
+                    }
+                }
+            });
+
+            inputEl.addEventListener('keydown', function(e) {
+                if (this.selectionStart === 1 && this.selectionEnd === 1 && e.key === 'Backspace') {
+                    e.preventDefault();
+                }
+                if (this.selectionStart === 0 && e.key === 'Delete') {
+                    e.preventDefault();
                 }
             });
         });
@@ -299,7 +331,7 @@
             submitData.append('nohp', document.getElementById('nohp').value);
             submitData.append('email', document.getElementById('email').value);
             submitData.append('kategori', document.getElementById('kategori').value);
-            submitData.append('agama', document.getElementById('agama').value); // <--- DATA AGAMA IKUT DIKIRIM
+            submitData.append('agama', document.getElementById('agama').value);
             
             // Logika sosmed
             submitData.append('facebook', sosmedConfig.fb.cb.checked ? sosmedConfig.fb.input.value : " - ");
