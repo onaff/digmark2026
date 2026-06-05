@@ -25,14 +25,13 @@
         .border-upz-biru { border-left-color: #007bff !important; }
         .text-upz-biru { color: #007bff !important; }
 
-        /* Optimasi Tampilan Mobile */
+        /* Optimasi Tampilan Seluler (Responsive Mobile) */
         @media (max-width: 576px) {
             .navbar-brand { font-size: 1.1rem; }
             .card-body { padding: 10px !important; }
             .table th, .table td { font-size: 0.85rem !important; padding: 8px 6px !important; }
             .badge { font-size: 0.75rem !important; }
             
-            /* Agar total 5 kartu (1 besar, 4 kategori) muat dan rapi di mobile: */
             .card-stat { border-left-width: 3px; padding: 8px 6px !important; }
             .stat-title { font-size: 0.7rem !important; }
             .stat-number { font-size: 1.2rem !important; }
@@ -44,10 +43,10 @@
     <nav class="navbar navbar-dark bg-baznas sticky-top sticky-top-custom mb-3 mb-md-4">
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <span class="navbar-brand mb-0 h1 fw-bold">
-                <i class="fa-solid fa-chart-line me-2"></i>Admin Dashboard
+                <i class="fa-solid fa-chart-line me-2"></i>Admin Dashboard BAZNAS
             </span>
             <button class="btn btn-light btn-sm fw-bold px-3" onclick="muatData()">
-                <i class="fa-solid fa-sync me-1"></i> <span class="d-none d-sm-inline">Refresh</span>
+                <i class="fa-solid fa-sync me-1"></i> <span class="d-none d-sm-inline">Refresh Data</span>
             </button>
         </div>
     </nav>
@@ -56,7 +55,7 @@
         
         <div id="loading" class="text-center py-5">
             <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
-            <h6 class="text-secondary">Mengambil data dari server...</h6>
+            <h6 class="text-secondary">Mengambil data dari server Google Sheets...</h6>
         </div>
 
         <div id="mainContent" class="d-none">
@@ -66,7 +65,7 @@
                     <div class="card card-stat shadow-sm p-3">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h6 class="text-muted text-uppercase small mb-1 fw-bold">Total Pendaftar (Seluruh Program)</h6>
+                                <h6 class="text-muted text-uppercase small mb-1 fw-bold">Total Pendaftar</h6>
                                 <h2 class="fw-bold mb-0 text-success" id="statTotal">0</h2>
                             </div>
                             <div class="fs-1 text-success"><i class="fa-solid fa-users"></i></div>
@@ -113,7 +112,7 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0 p-3 h-100">
-                        <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-pie-chart me-1"></i> Proporsi Kategori Program</h6>
+                        <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-chart-pie me-1"></i> Proporsi Kategori Program</h6>
                         <div style="max-height: 230px;" class="d-flex justify-content-center">
                             <canvas id="chartKategori"></canvas>
                         </div>
@@ -150,8 +149,7 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Nama</th>
-                                    <th>Kecamatan</th>
-                                    <th>Kelurahan</th>
+                                    <th>Kecamatan (Kelurahan)</th>
                                     <th>Alamat Detail</th>
                                     <th>Usia</th>
                                     <th>Agama</th> <th>No HP</th>
@@ -174,6 +172,7 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
     <script>
+        // ⚠️ GANTI STRING DI BAWAH DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA ⚠️
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwz9Jxk_dRaxm_EPqQNy6tBx9TNx-b4nEDK_BEGxTHCEasNuz2Ia_7QHpktgp05xhFH/exec';
         let masterData = [];
         let chart1, chart2;
@@ -207,33 +206,47 @@
             let kecamatanCounts = { "Argomulyo": 0, "Sidomukti": 0, "Sidorejo": 0, "Tingkir": 0 };
 
             data.forEach((item, index) => {
-                // Perhitungan Kategori Baru
-                if(item.kategori === 'UMKM Binaan') countUmkm++;
-                else if(item.kategori === 'ZMart') countZmart++;
-                else if(item.kategori === 'UPZ') countUpz++;
+                // Kalkulasi data statistik berdasarkan kategori
+                if (item.kategori === 'UMKM Binaan') countUmkm++;
+                else if (item.kategori === 'ZMart') countZmart++;
+                else if (item.kategori === 'UPZ') countUpz++;
                 else countUmum++;
                 
                 if (kecamatanCounts[item.kecamatan] !== undefined) kecamatanCounts[item.kecamatan]++;
 
+                // Format nomor WhatsApp agar otomatis 62
                 let cleanWA = item.nohp ? item.nohp.replace(/[^0-9]/g, '') : '';
+                if (cleanWA.startsWith('0')) {
+                    cleanWA = '62' + cleanWA.substring(1);
+                } else if (cleanWA.startsWith('8')) {
+                    cleanWA = '62' + cleanWA;
+                }
                 
-                // Menentukan warna badge kategori
+                // Pewarnaan lencana pendaftar program
                 let badgeClass = 'bg-secondary';
-                if(item.kategori === 'UMKM Binaan') badgeClass = 'bg-warning text-dark';
-                else if(item.kategori === 'ZMart') badgeClass = 'bg-danger';
-                else if(item.kategori === 'UPZ') badgeClass = 'bg-primary';
+                if (item.kategori === 'UMKM Binaan') badgeClass = 'bg-warning text-dark';
+                else if (item.kategori === 'ZMart') badgeClass = 'bg-danger';
+                else if (item.kategori === 'UPZ') badgeClass = 'bg-primary';
 
+                // Kolom Kelurahan digabung ke dalam kolom Kecamatan
                 let row = `<tr>
                     <td class="text-center">${index + 1}</td>
                     <td class="fw-bold text-nowrap">${item.nama}</td>
-                    <td><span class="badge bg-secondary">${item.kecamatan}</span></td>
-                    <td class="text-nowrap">${item.kelurahan}</td>
+                    <td>
+                        <span class="badge bg-secondary mb-1 d-inline-block">${item.kecamatan}</span>
+                        <br><small class="text-muted">${item.kelurahan || ''}</small>
+                    </td>
                     <td class="small text-wrap" style="max-width: 150px;">${item.alamat}</td>
                     <td>${item.usia} Thn</td>
-                    <td class="fw-semibold">${item.agama || '-'}</td> <td class="text-nowrap"><a href="https://wa.me/${cleanWA}" target="_blank" class="text-decoration-none"><i class="fa-brands fa-whatsapp text-success me-1"></i>${item.nohp}</a></td>
+                    <td class="fw-semibold">${item.agama || ' - '}</td> 
+                    <td class="text-nowrap">
+                        <a href="https://wa.me/${cleanWA}" target="_blank" class="text-decoration-none">
+                            <i class="fa-brands fa-whatsapp text-success me-1"></i>${item.nohp}
+                        </a>
+                    </td>
                     <td class="small">${item.email}</td>
                     <td><span class="badge ${badgeClass}">${item.kategori}</span></td>
-                    <td class="small">FB: ${item.facebook}<br>IG: ${item.instagram}</td>
+                    <td class="small">FB: ${item.facebook}<br>IG: ${item.instagram}<br>TT: ${item.tiktok}</td>
                 </tr>`;
                 tbody.insertAdjacentHTML('beforeend', row);
             });
@@ -248,10 +261,10 @@
         }
 
         function buildCharts(umkm, zmart, upz, umum, kecData) {
-            if(chart1) chart1.destroy();
-            if(chart2) chart2.destroy();
+            if (chart1) chart1.destroy();
+            if (chart2) chart2.destroy();
 
-            // PIE CHART DENGAN 4 KATEGORI
+            // RENDER PIE CHART 4 PILIHAN KATEGORI PROGRAM
             const ctxKat = document.getElementById('chartKategori').getContext('2d');
             chart1 = new Chart(ctxKat, {
                 type: 'pie',
@@ -265,6 +278,7 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
+            // RENDER BAR CHART KECAMATAN
             const ctxKec = document.getElementById('chartKecamatan').getContext('2d');
             chart2 = new Chart(ctxKec, {
                 type: 'bar',
@@ -280,7 +294,7 @@
             });
         }
 
-        // Live Search otomatis mendukung pencarian kolom Agama
+        // FUNGSI LIVE PENCARIAN OTOMATIS
         document.getElementById('inputCari').addEventListener('keyup', function() {
             let filter = this.value.toLowerCase();
             let rows = document.querySelectorAll('#dataTabel tr');
@@ -289,7 +303,143 @@
             });
         });
 
-        // Catatan: sesuaikan juga urutan array kolom pada fungsi exportKeExcel() Anda agar kolom Agama ikut terunduh.
+        // FUNGSI EXPORT EXCEL PROFESIONAL (Tetap mempertahankan kolom Kelurahan terpisah)
+        function exportKeExcel() {
+            if (masterData.length === 0) {
+                alert("Tidak ada data yang bisa diexport!");
+                return;
+            }
+
+            const barisJudul1 = ["PESERTA PELATIHAN DIGITAL MARKETING"];
+            const barisJudul2 = ["10 Juni 2026"];
+            const barisKosong = [""];
+
+            const headers = [
+                "No", "Nama Lengkap", "Kecamatan", "Kelurahan", 
+                "Alamat Rumah", "Usia", "Kategori Program", "Agama", 
+                "No. HP / WhatsApp", "Alamat Email", "Facebook", "Instagram", "TikTok", "Sosmed Lainnya"
+            ];
+
+            const rowsData = [
+                barisJudul1,
+                barisJudul2,
+                barisKosong,
+                headers
+            ];
+
+            masterData.forEach((item, index) => {
+                rowsData.push([
+                    index + 1,
+                    item.nama,
+                    item.kecamatan,
+                    item.kelurahan,
+                    item.alamat,
+                    parseInt(item.usia) || item.usia,
+                    item.kategori,
+                    item.agama || " - ",
+                    item.nohp,
+                    item.email,
+                    item.facebook,
+                    item.instagram,
+                    item.tiktok,
+                    item.sosmed_lain
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(rowsData);
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            
+            ws['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 13 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 13 } }
+            ];
+
+            const borderGarisTabel = {
+                top: { style: "thin", color: { rgb: "D3D3D3" } },
+                bottom: { style: "thin", color: { rgb: "D3D3D3" } },
+                left: { style: "thin", color: { rgb: "D3D3D3" } },
+                right: { style: "thin", color: { rgb: "D3D3D3" } }
+            };
+
+            const headerStyle = {
+                fill: { fgColor: { rgb: "0B6623" } },
+                font: { name: "Segoe UI", size: 11, bold: true, color: { rgb: "FFFFFF" } },
+                alignment: { vertical: "center", horizontal: "center", wrapText: true },
+                border: {
+                    top: { style: "thin", color: { rgb: "000000" } },
+                    bottom: { style: "medium", color: { rgb: "000000" } },
+                    left: { style: "thin", color: { rgb: "000000" } },
+                    right: { style: "thin", color: { rgb: "000000" } }
+                }
+            };
+
+            const dataStyleDefault = {
+                font: { name: "Segoe UI", size: 10 },
+                alignment: { vertical: "center", horizontal: "left" },
+                border: borderGarisTabel
+            };
+
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+                    
+                    if (!ws[cellAddress]) {
+                        if (R >= 3) ws[cellAddress] = { t: 's', v: '' };
+                        else continue;
+                    }
+                    if (!ws[cellAddress].s) ws[cellAddress].s = {};
+
+                    if (R === 0) {
+                        ws[cellAddress].s.font = { name: "Segoe UI", size: 14, bold: true, color: { rgb: "0B6623" } };
+                        ws[cellAddress].s.alignment = { horizontal: "center", vertical: "center" };
+                        continue;
+                    }
+                    if (R === 1) {
+                        ws[cellAddress].s.font = { name: "Segoe UI", size: 11, italic: true, color: { rgb: "555555" } };
+                        ws[cellAddress].s.alignment = { horizontal: "center", vertical: "center" };
+                        continue;
+                    }
+                    if (R === 2) continue;
+
+                    if (R === 3) {
+                        ws[cellAddress].s = headerStyle;
+                    } 
+                    else if (R >= 4) {
+                        let currentStyle = JSON.parse(JSON.stringify(dataStyleDefault));
+                        
+                        if (C === 0 || C === 5) { 
+                            currentStyle.alignment.horizontal = "center";
+                        }
+                        if (R % 2 === 1) {
+                            currentStyle.fill = { type: "pattern", pattern: "solid", fgColor: { rgb: "F9F9F9" } };
+                        }
+                        ws[cellAddress].s = currentStyle;
+                    }
+                }
+            }
+
+            const colWidths = headers.map((header, colIndex) => {
+                let maxLength = header.length;
+                for (let rowIndex = 3; rowIndex < rowsData.length; rowIndex++) {
+                    const cellValue = rowsData[rowIndex][colIndex];
+                    if (cellValue !== undefined && cellValue !== null) {
+                        const len = cellValue.toString().length;
+                        if (len > maxLength) maxLength = len;
+                    }
+                }
+                return { wch: maxLength + 3 };
+            });
+            ws['!cols'] = colWidths;
+            ws['!rows'] = [, , , { hpt: 28 }]; 
+
+            ws['!views'] = [{ state: 'frozen', ySplit: 4, showGridLines: true }];
+            ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 3, c: 0 }, e: { r: range.e.r, c: range.e.c } }) };
+
+            XLSX.utils.book_append_sheet(wb, ws, "Data Pendaftar");
+            const tanggalHariIni = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `Data_Pendaftar_Digital_Marketing_BAZNAS_${tanggalHariIni}.xlsx`);
+        }
     </script>
 </body>
 </html>
