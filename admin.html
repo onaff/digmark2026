@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - BAZNAS Kota Salatiga</title>
+    <title>Dashboard Admin v2 - BAZNAS Kota Salatiga</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -12,7 +12,6 @@
         .card-stat { border-left: 4px solid #0b6623; }
         .table-responsive { max-height: 550px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
-        /* Menyesuaikan shadow & z-index navbar agar selalu berada di lapisan paling depan saat di-scroll */
         .sticky-top-custom {
             position: -webkit-sticky;
             position: sticky;
@@ -21,9 +20,10 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
         }
 
-        /* Kustomisasi khusus untuk warna merah menyala pada indikator ZMart */
         .border-zmart-merah { border-left-color: #ff0000 !important; }
         .text-zmart-merah { color: #ff0000 !important; }
+        .border-upz-biru { border-left-color: #007bff !important; }
+        .text-upz-biru { color: #007bff !important; }
 
         /* Optimasi Tampilan Mobile */
         @media (max-width: 576px) {
@@ -32,10 +32,10 @@
             .table th, .table td { font-size: 0.85rem !important; padding: 8px 6px !important; }
             .badge { font-size: 0.75rem !important; }
             
-            /* PERUBAHAN MOBILE: Menyesuaikan teks & ukuran kartu agar pas diisi 3 kolom sejajar */
+            /* Agar total 5 kartu (1 besar, 4 kategori) muat dan rapi di mobile: */
             .card-stat { border-left-width: 3px; padding: 8px 6px !important; }
-            .stat-title { font-size: 0.65rem !important; }
-            .stat-number { font-size: 1.25rem !important; }
+            .stat-title { font-size: 0.7rem !important; }
+            .stat-number { font-size: 1.2rem !important; }
         }
     </style>
 </head>
@@ -61,37 +61,50 @@
 
         <div id="mainContent" class="d-none">
             
-            <div class="row g-1 g-md-3 mb-4">
-                <div class="col-4 col-md-4">
-                    <div class="card card-stat shadow-sm p-2 p-md-3 h-100">
+            <div class="row g-2 mb-2">
+                <div class="col-12">
+                    <div class="card card-stat shadow-sm p-3">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h6 class="text-muted text-uppercase small mb-1 stat-title" style="font-size: 0.75rem;">Total Daftar</h6>
-                                <h3 class="fw-bold mb-0 text-success fs-2 stat-number" id="statTotal">0</h3>
+                                <h6 class="text-muted text-uppercase small mb-1 fw-bold">Total Pendaftar (Seluruh Program)</h6>
+                                <h2 class="fw-bold mb-0 text-success" id="statTotal">0</h2>
                             </div>
-                            <div class="fs-1 text-success d-none d-sm-block"><i class="fa-solid fa-users"></i></div>
+                            <div class="fs-1 text-success"><i class="fa-solid fa-users"></i></div>
                         </div>
                     </div>
                 </div>
-                <div class="col-4 col-md-4">
+            </div>
+
+            <div class="row g-2 g-md-3 mb-4">
+                <div class="col-6 col-md-3">
                     <div class="card card-stat shadow-sm p-2 p-md-3 h-100 border-warning">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h6 class="text-muted text-uppercase small mb-1 stat-title" style="font-size: 0.75rem;">UMKM Binaan</h6>
-                                <h3 class="fw-bold mb-0 text-warning fs-2 stat-number" id="statUmkm">0</h3>
-                            </div>
-                            <div class="fs-1 text-warning d-none d-sm-block"><i class="fa-solid fa-store"></i></div>
+                        <div class="card-body p-0">
+                            <h6 class="text-muted text-uppercase small mb-1 stat-title">UMKM Binaan</h6>
+                            <h3 class="fw-bold mb-0 text-warning stat-number" id="statUmkm">0</h3>
                         </div>
                     </div>
                 </div>
-                <div class="col-4 col-md-4">
+                <div class="col-6 col-md-3">
                     <div class="card card-stat shadow-sm p-2 p-md-3 h-100 border-zmart-merah">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h6 class="text-muted text-uppercase small mb-1 stat-title" style="font-size: 0.75rem;">ZMart</h6>
-                                <h3 class="fw-bold mb-0 text-zmart-merah fs-2 stat-number" id="statZmart">0</h3>
-                            </div>
-                            <div class="fs-1 text-zmart-merah d-none d-sm-block"><i class="fa-solid fa-shop"></i></div>
+                        <div class="card-body p-0">
+                            <h6 class="text-muted text-uppercase small mb-1 stat-title">ZMart</h6>
+                            <h3 class="fw-bold mb-0 text-zmart-merah stat-number" id="statZmart">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card card-stat shadow-sm p-2 p-md-3 h-100 border-upz-biru">
+                        <div class="card-body p-0">
+                            <h6 class="text-muted text-uppercase small mb-1 stat-title">UPZ Masjid</h6>
+                            <h3 class="fw-bold mb-0 text-upz-biru stat-number" id="statUpz">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card card-stat shadow-sm p-2 p-md-3 h-100 border-secondary">
+                        <div class="card-body p-0">
+                            <h6 class="text-muted text-uppercase small mb-1 stat-title">Umum</h6>
+                            <h3 class="fw-bold mb-0 text-secondary stat-number" id="statUmum">0</h3>
                         </div>
                     </div>
                 </div>
@@ -126,7 +139,7 @@
                     </div>
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
-                        <input type="text" id="inputCari" class="form-control bg-light border-start-0" placeholder="Cari nama, kecamatan, atau nomor...">
+                        <input type="text" id="inputCari" class="form-control bg-light border-start-0" placeholder="Cari nama, kecamatan, agama, atau kategori...">
                     </div>
                 </div>
                 
@@ -141,7 +154,7 @@
                                     <th>Kelurahan</th>
                                     <th>Alamat Detail</th>
                                     <th>Usia</th>
-                                    <th>No HP</th>
+                                    <th>Agama</th> <th>No HP</th>
                                     <th>Email</th>
                                     <th>Kategori</th>
                                     <th>Sosmed</th>
@@ -162,42 +175,26 @@
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwz9Jxk_dRaxm_EPqQNy6tBx9TNx-b4nEDK_BEGxTHCEasNuz2Ia_7QHpktgp05xhFH/exec';
-        
         let masterData = [];
         let chart1, chart2;
 
-        document.addEventListener("DOMContentLoaded", () => {
-            muatData();
-        });
+        document.addEventListener("DOMContentLoaded", () => { muatData(); });
 
         function muatData() {
             document.getElementById('loading').classList.remove('d-none');
             document.getElementById('mainContent').classList.add('d-none');
-
             const oldScript = document.getElementById('jsonpScript');
             if (oldScript) oldScript.remove();
 
             const script = document.createElement('script');
             script.id = 'jsonpScript';
             script.src = `${scriptURL}?callback=prosesDataAdmin`;
-            
-            script.onerror = function() {
-                alert("Gagal memuat data! Periksa apakah URL Web App Admin sudah benar.");
-                document.getElementById('loading').classList.add('d-none');
-            };
-
             document.body.appendChild(script);
         }
 
         function prosesDataAdmin(data) {
-            if (data.error) {
-                alert("Error dari skrip Google: " + data.error);
-                document.getElementById('loading').classList.add('d-none');
-                return;
-            }
             masterData = data;
             renderDashboard(data);
-            
             document.getElementById('loading').classList.add('d-none');
             document.getElementById('mainContent').classList.remove('d-none');
         }
@@ -206,43 +203,37 @@
             const tbody = document.getElementById('dataTabel');
             tbody.innerHTML = '';
 
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">Belum ada data pendaftar yang masuk di Google Sheet.</td></tr>';
-                return;
-            }
-
-            let countUmkm = 0;
-            let countZmart = 0;
+            let countUmkm = 0, countZmart = 0, countUpz = 0, countUmum = 0;
             let kecamatanCounts = { "Argomulyo": 0, "Sidomukti": 0, "Sidorejo": 0, "Tingkir": 0 };
 
             data.forEach((item, index) => {
+                // Perhitungan Kategori Baru
                 if(item.kategori === 'UMKM Binaan') countUmkm++;
-                if(item.kategori === 'ZMart') countZmart++;
+                else if(item.kategori === 'ZMart') countZmart++;
+                else if(item.kategori === 'UPZ') countUpz++;
+                else countUmum++;
                 
-                if (kecamatanCounts[item.kecamatan] !== undefined) {
-                    kecamatanCounts[item.kecamatan]++;
-                }
+                if (kecamatanCounts[item.kecamatan] !== undefined) kecamatanCounts[item.kecamatan]++;
 
-                let sosmedBadge = `<div style="min-width: 110px; font-size: 0.8rem; line-height: 1.3;">
-                    <strong>FB:</strong> ${item.facebook || '-'}<br>
-                    <strong>IG:</strong> ${item.instagram || '-'}<br>
-                    <strong>TT:</strong> ${item.tiktok || '-'}<br>
-                    <strong>LN:</strong> ${item.sosmed_lain || '-'}
-                </div>`;
-
-                let cleanWA = item.nohp.replace(/[^0-9]/g, '');
+                let cleanWA = item.nohp ? item.nohp.replace(/[^0-9]/g, '') : '';
+                
+                // Menentukan warna badge kategori
+                let badgeClass = 'bg-secondary';
+                if(item.kategori === 'UMKM Binaan') badgeClass = 'bg-warning text-dark';
+                else if(item.kategori === 'ZMart') badgeClass = 'bg-danger';
+                else if(item.kategori === 'UPZ') badgeClass = 'bg-primary';
 
                 let row = `<tr>
                     <td class="text-center">${index + 1}</td>
                     <td class="fw-bold text-nowrap">${item.nama}</td>
                     <td><span class="badge bg-secondary">${item.kecamatan}</span></td>
                     <td class="text-nowrap">${item.kelurahan}</td>
-                    <td class="small text-wrap" style="max-width: 180px; min-width: 140px;">${item.alamat}</td>
-                    <td class="text-nowrap">${item.usia} Thn</td>
-                    <td class="text-nowrap"><a href="https://wa.me/${cleanWA}" target="_blank" class="text-decoration-none fw-semibold"><i class="fa-brands fa-whatsapp text-success me-1"></i>${item.nohp}</a></td>
+                    <td class="small text-wrap" style="max-width: 150px;">${item.alamat}</td>
+                    <td>${item.usia} Thn</td>
+                    <td class="fw-semibold">${item.agama || '-'}</td> <td class="text-nowrap"><a href="https://wa.me/${cleanWA}" target="_blank" class="text-decoration-none"><i class="fa-brands fa-whatsapp text-success me-1"></i>${item.nohp}</a></td>
                     <td class="small">${item.email}</td>
-                    <td><span class="badge ${item.kategori === 'UMKM Binaan' ? 'bg-warning text-dark' : 'bg-danger text-white'}">${item.kategori}</span></td>
-                    <td>${sosmedBadge}</td>
+                    <td><span class="badge ${badgeClass}">${item.kategori}</span></td>
+                    <td class="small">FB: ${item.facebook}<br>IG: ${item.instagram}</td>
                 </tr>`;
                 tbody.insertAdjacentHTML('beforeend', row);
             });
@@ -250,22 +241,25 @@
             document.getElementById('statTotal').innerText = data.length;
             document.getElementById('statUmkm').innerText = countUmkm;
             document.getElementById('statZmart').innerText = countZmart;
+            document.getElementById('statUpz').innerText = countUpz;
+            document.getElementById('statUmum').innerText = countUmum;
 
-            buildCharts(countUmkm, countZmart, data.length - (countUmkm + countZmart), kecamatanCounts);
+            buildCharts(countUmkm, countZmart, countUpz, countUmum, kecamatanCounts);
         }
 
-        function buildCharts(umkm, zmart, umum, kecData) {
+        function buildCharts(umkm, zmart, upz, umum, kecData) {
             if(chart1) chart1.destroy();
             if(chart2) chart2.destroy();
 
+            // PIE CHART DENGAN 4 KATEGORI
             const ctxKat = document.getElementById('chartKategori').getContext('2d');
             chart1 = new Chart(ctxKat, {
                 type: 'pie',
                 data: {
-                    labels: ['UMKM Binaan', 'ZMart', 'Umum/Lainnya'],
+                    labels: ['UMKM Binaan', 'ZMart', 'UPZ Masjid', 'Umum'],
                     datasets: [{
-                        data: [umkm, zmart, umum],
-                        backgroundColor: ['#ffc107', '#ff0000', '#6c757d']
+                        data: [umkm, zmart, upz, umum],
+                        backgroundColor: ['#ffc107', '#ff0000', '#007bff', '#6c757d']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -282,145 +276,20 @@
                         backgroundColor: '#0b6623'
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-                }
+                options: { responsive: true, maintainAspectRatio: false }
             });
         }
 
-        // Live Search
+        // Live Search otomatis mendukung pencarian kolom Agama
         document.getElementById('inputCari').addEventListener('keyup', function() {
             let filter = this.value.toLowerCase();
             let rows = document.querySelectorAll('#dataTabel tr');
-
             rows.forEach(row => {
-                let text = row.textContent.toLowerCase();
-                if(text.includes(filter)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none';
             });
         });
 
-        function exportKeExcel() {
-            if (masterData.length === 0) {
-                alert("Tidak ada data untuk di-export!");
-                return;
-            }
-
-            const barisJudul1 = ["PESERTA PELATIHAN DIGITAL MARKETING"];
-            const barisJudul2 = ["10 Juni 2026"];
-            const barisKosong = [""];
-            const headerKolom = ["No", "Nama", "Kecamatan", "Kelurahan", "Alamat Detail", "Usia", "No HP", "Email", "Kategori", "Facebook", "Instagram", "TikTok", "Sosmed Lainnya"];
-
-            const rowsData = [
-                barisJudul1,
-                barisJudul2,
-                barisKosong,
-                headerKolom
-            ];
-
-            masterData.forEach((item, index) => {
-                rowsData.push([
-                    index + 1,
-                    item.nama,
-                    item.kecamatan,
-                    item.kelurahan,
-                    item.alamat,
-                    item.usia + " Thn",
-                    item.nohp,
-                    item.email,
-                    item.kategori,
-                    item.facebook,
-                    item.instagram,
-                    item.tiktok,
-                    item.sosmed_lain
-                ]);
-            });
-
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(rowsData);
-
-            ws['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 12 } }, 
-                { s: { r: 1, c: 0 }, e: { r: 1, c: 12 } }  
-            ];
-
-            const borderGarisTabel = {
-                top: { style: "thin", color: { rgb: "D3D3D3" } },
-                bottom: { style: "thin", color: { rgb: "D3D3D3" } },
-                left: { style: "thin", color: { rgb: "D3D3D3" } },
-                right: { style: "thin", color: { rgb: "D3D3D3" } }
-            };
-
-            const range = XLSX.utils.decode_range(ws['!ref']);
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    const cell_address = { r: R, c: C };
-                    const cell_ref = XLSX.utils.encode_cell(cell_address);
-                    
-                    if (!ws[cell_ref]) {
-                        if (R >= 3) ws[cell_ref] = { t: 's', v: '' };
-                        else continue;
-                    }
-                    if (!ws[cell_ref].s) ws[cell_ref].s = {};
-
-                    if (R === 0) {
-                        ws[cell_ref].s.font = { name: "Segoe UI", size: 14, bold: true, color: { rgb: "0B6623" } };
-                        ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
-                        continue;
-                    }
-                    if (R === 1) {
-                        ws[cell_ref].s.font = { name: "Segoe UI", size: 11, italic: true, color: { rgb: "555555" } };
-                        ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
-                        continue;
-                    }
-                    if (R === 2) continue;
-
-                    if (R === 3) {
-                        ws[cell_ref].s.font = { name: "Segoe UI", size: 11, bold: true, color: { rgb: "FFFFFF" } };
-                        ws[cell_ref].s.fill = { type: "pattern", pattern: "solid", fgColor: { rgb: "0B6623" } }; 
-                        ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
-                        ws[cell_ref].s.border = borderGabel = borderGarisTabel;
-                    } 
-                    else if (R >= 4) {
-                        ws[cell_ref].s.font = { name: "Segoe UI", size: 10 };
-                        ws[cell_ref].s.border = borderGarisTabel;
-                        
-                        if (C === 0 || C === 5 || C === 6 || C === 8) {
-                            ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
-                        } else {
-                            ws[cell_ref].s.alignment = { horizontal: "left", vertical: "center" };
-                        }
-
-                        if (R % 2 === 1) {
-                            ws[cell_ref].s.fill = { type: "pattern", pattern: "solid", fgColor: { rgb: "F9F9F9" } };
-                        }
-                    }
-                }
-            }
-
-            ws['!views'] = [{ showGridLines: true }];
-
-            const colWidths = headerKolom.map((header, colIndex) => {
-                let maxLen = header.length;
-                for (let rowIndex = 4; rowIndex < rowsData.length; rowIndex++) {
-                    const val = rowsData[rowIndex][colIndex];
-                    if (val !== undefined && val !== null) {
-                        const len = val.toString().length;
-                        if (len > maxLen) maxLen = len;
-                    }
-                }
-                return { wch: maxLen + 4 };
-            });
-            ws['!cols'] = colWidths;
-
-            XLSX.utils.book_append_sheet(wb, ws, "Data Peserta");
-            XLSX.writeFile(wb, "Rekap_Peserta_Digital_Marketing_BAZNAS.xlsx");
-        }
+        // Catatan: sesuaikan juga urutan array kolom pada fungsi exportKeExcel() Anda agar kolom Agama ikut terunduh.
     </script>
 </body>
 </html>
