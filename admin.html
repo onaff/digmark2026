@@ -10,70 +10,93 @@
         body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
         .bg-baznas { background-color: #0b6623; color: white; }
         .card-stat { border-left: 4px solid #0b6623; }
-        .table-responsive { max-height: 500px; overflow-y: auto; }
+        .table-responsive { max-height: 550px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        
+        /* PERUBAHAN: Menyesuaikan shadow & z-index navbar agar selalu berada di lapisan paling depan saat di-scroll */
+        .sticky-top-custom {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+        }
+
+        /* Kustomisasi khusus untuk warna merah menyala pada indikator ZMart */
+        .border-zmart-merah { border-left-color: #ff0000 !important; }
+        .text-zmart-merah { color: #ff0000 !important; }
+
+        /* Optimasi Tampilan Mobile */
+        @media (max-width: 576px) {
+            .navbar-brand { font-size: 1.1rem; }
+            .card-body { padding: 10px !important; }
+            .table th, .table td { font-size: 0.85rem !important; padding: 8px 6px !important; }
+            .badge { font-size: 0.75rem !important; }
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-dark bg-baznas shadow-sm mb-4">
-        <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">
-                <i class="fa-solid fa-chart-line me-2"></i>Dashboard Admin
+    <nav class="navbar navbar-dark bg-baznas sticky-top sticky-top-custom mb-3 mb-md-4">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <span class="navbar-brand mb-0 h1 fw-bold">
+                <i class="fa-solid fa-chart-line me-2"></i>Admin Dashboard
             </span>
-            <button class="btn btn-light btn-sm" onclick="muatData()"><i class="fa-solid fa-sync me-1"></i> Refresh Data</button>
+            <button class="btn btn-light btn-sm fw-bold px-3" onclick="muatData()">
+                <i class="fa-solid fa-sync me-1"></i> <span class="d-none d-sm-inline">Refresh</span>
+            </button>
         </div>
     </nav>
 
-    <div class="container-fluid px-4 mb-5">
+    <div class="container-fluid px-2 px-md-4 mb-5">
         
         <div id="loading" class="text-center py-5">
             <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
-            <h5>Mengambil data...</h5>
+            <h6 class="text-secondary">Mengambil data dari server...</h6>
         </div>
 
         <div id="mainContent" class="d-none">
             
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <div class="card card-stat shadow-sm p-3">
+            <div class="row g-2 g-md-3 mb-4">
+                <div class="col-6 col-md-4">
+                    <div class="card card-stat shadow-sm p-2 p-md-3 h-100">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h6 class="text-muted text-uppercase small">Total Pendaftar</h6>
-                                <h3 class="fw-bold mb-0" id="statTotal">0</h3>
+                                <h6 class="text-muted text-uppercase small mb-1" style="font-size: 0.75rem;">Total Daftar</h6>
+                                <h3 class="fw-bold mb-0 text-success fs-2" id="statTotal">0</h3>
                             </div>
-                            <div class="fs-1 text-success"><i class="fa-solid fa-users"></i></div>
+                            <div class="fs-1 text-success d-none d-sm-block"><i class="fa-solid fa-users"></i></div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card card-stat shadow-sm p-3 border-warning">
+                <div class="col-6 col-md-4">
+                    <div class="card card-stat shadow-sm p-2 p-md-3 h-100 border-warning">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h6 class="text-muted text-uppercase small">UMKM Binaan</h6>
-                                <h3 class="fw-bold mb-0 text-warning" id="statUmkm">0</h3>
+                                <h6 class="text-muted text-uppercase small mb-1" style="font-size: 0.75rem;">UMKM Binaan</h6>
+                                <h3 class="fw-bold mb-0 text-warning fs-2" id="statUmkm">0</h3>
                             </div>
-                            <div class="fs-1 text-warning"><i class="fa-solid fa-store"></i></div>
+                            <div class="fs-1 text-warning d-none d-sm-block"><i class="fa-solid fa-store"></i></div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card card-stat shadow-sm p-3 border-info">
+                <div class="col-12 col-md-4 mt-2 mt-md-0">
+                    <div class="card card-stat shadow-sm p-2 p-md-3 h-100 border-zmart-merah">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h6 class="text-muted text-uppercase small">ZMart</h6>
-                                <h3 class="fw-bold mb-0 text-info" id="statZmart">0</h3>
+                                <h6 class="text-muted text-uppercase small mb-1" style="font-size: 0.75rem;">ZMart</h6>
+                                <h3 class="fw-bold mb-0 text-zmart-merah fs-2" id="statZmart">0</h3>
                             </div>
-                            <div class="fs-1 text-info"><i class="fa-solid fa-shop"></i></div>
+                            <div class="fs-1 text-zmart-merah d-none d-sm-block"><i class="fa-solid fa-shop"></i></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row g-4 mb-4">
+            <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0 p-3 h-100">
                         <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-pie-chart me-1"></i> Proporsi Kategori Program</h6>
-                        <div style="max-height: 250px;" class="d-flex justify-content-center">
+                        <div style="max-height: 230px;" class="d-flex justify-content-center">
                             <canvas id="chartKategori"></canvas>
                         </div>
                     </div>
@@ -81,28 +104,31 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0 p-3 h-100">
                         <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-map-location-dot me-1"></i> Sebaran Per Kecamatan</h6>
-                        <canvas id="chartKecamatan"></canvas>
+                        <div style="max-height: 200px;" class="d-flex justify-content-center w-100">
+                            <canvas id="chartKecamatan"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
-                    <h5 class="mb-0 fw-bold text-secondary"><i class="fa-solid fa-list me-1"></i> Data Lengkap Calon Peserta</h5>
-                    <div class="d-flex gap-2 w-100 justify-content-md-end" style="max-width: 500px;">
-                        <button class="btn btn-success text-nowrap" onclick="exportKeExcel()">
-                            <i class="fa-solid fa-file-excel me-1"></i> Export ke Excel
+                <div class="card-header bg-white py-3 d-flex flex-column gap-3">
+                    <div class="d-flex align-items-center justify-content-between w-100">
+                        <h5 class="mb-0 fw-bold text-secondary"><i class="fa-solid fa-list me-1"></i> Data Calon Peserta</h5>
+                        <button class="btn btn-success btn-sm text-nowrap" onclick="exportKeExcel()">
+                            <i class="fa-solid fa-file-excel me-1"></i> Export Excel
                         </button>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
-                            <input type="text" id="inputCari" class="form-control bg-light border-start-0" placeholder="Cari data...">
-                        </div>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                        <input type="text" id="inputCari" class="form-control bg-light border-start-0" placeholder="Cari nama, kecamatan, atau nomor...">
                     </div>
                 </div>
+                
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light text-secondary">
+                            <thead class="table-light text-secondary text-nowrap">
                                 <tr>
                                     <th>No</th>
                                     <th>Nama</th>
@@ -192,25 +218,25 @@
                     kecamatanCounts[item.kecamatan]++;
                 }
 
-                let sosmedBadge = `<small>
-                    FB: ${item.facebook}<br>
-                    IG: ${item.instagram}<br>
-                    TT: ${item.tiktok}<br>
-                    Lain: ${item.sosmed_lain}
-                </small>`;
+                let sosmedBadge = `<div style="min-width: 110px; font-size: 0.8rem; line-height: 1.3;">
+                    <strong>FB:</strong> ${item.facebook || '-'}<br>
+                    <strong>IG:</strong> ${item.instagram || '-'}<br>
+                    <strong>TT:</strong> ${item.tiktok || '-'}<br>
+                    <strong>LN:</strong> ${item.sosmed_lain || '-'}
+                </div>`;
 
                 let cleanWA = item.nohp.replace(/[^0-9]/g, '');
 
                 let row = `<tr>
-                    <td>${index + 1}</td>
-                    <td class="fw-bold">${item.nama}</td>
+                    <td class="text-center">${index + 1}</td>
+                    <td class="fw-bold text-nowrap">${item.nama}</td>
                     <td><span class="badge bg-secondary">${item.kecamatan}</span></td>
-                    <td>${item.kelurahan}</td>
-                    <td class="small text-wrap" style="max-width: 200px;">${item.alamat}</td>
-                    <td>${item.usia} Thn</td>
-                    <td><a href="https://wa.me/${cleanWA}" target="_blank" class="text-decoration-none"><i class="fa-brands fa-whatsapp text-success me-1"></i>${item.nohp}</a></td>
+                    <td class="text-nowrap">${item.kelurahan}</td>
+                    <td class="small text-wrap" style="max-width: 180px; min-width: 140px;">${item.alamat}</td>
+                    <td class="text-nowrap">${item.usia} Thn</td>
+                    <td class="text-nowrap"><a href="https://wa.me/${cleanWA}" target="_blank" class="text-decoration-none fw-semibold"><i class="fa-brands fa-whatsapp text-success me-1"></i>${item.nohp}</a></td>
                     <td class="small">${item.email}</td>
-                    <td><span class="badge ${item.kategori === 'UMKM Binaan' ? 'bg-warning text-dark' : 'bg-info text-dark'}">${item.kategori}</span></td>
+                    <td><span class="badge ${item.kategori === 'UMKM Binaan' ? 'bg-warning text-dark' : 'bg-danger text-white'}">${item.kategori}</span></td>
                     <td>${sosmedBadge}</td>
                 </tr>`;
                 tbody.insertAdjacentHTML('beforeend', row);
@@ -234,7 +260,7 @@
                     labels: ['UMKM Binaan', 'ZMart', 'Umum/Lainnya'],
                     datasets: [{
                         data: [umkm, zmart, umum],
-                        backgroundColor: ['#ffc107', '#0dcaf0', '#6c757d']
+                        backgroundColor: ['#ffc107', '#ff0000', '#6c757d']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -253,6 +279,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
                 }
             });
@@ -273,14 +300,12 @@
             });
         });
 
-        // PERUBAHAN UTAMA: Logika Format Excel Profesional (Border Garis, Judul, Perataan Tengah)
         function exportKeExcel() {
             if (masterData.length === 0) {
                 alert("Tidak ada data untuk di-export!");
                 return;
             }
 
-            // 1. Penyusunan teks baris judul, tanggal, dan kolom header rekap
             const barisJudul1 = ["PESERTA PELATIHAN DIGITAL MARKETING"];
             const barisJudul2 = ["10 Juni 2026"];
             const barisKosong = [""];
@@ -314,13 +339,11 @@
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(rowsData);
 
-            // Penggabungan (Merge) kolom judul dari A s.d M (index 0 - 12) agar bisa center sempurna
             ws['!merges'] = [
                 { s: { r: 0, c: 0 }, e: { r: 0, c: 12 } }, 
                 { s: { r: 1, c: 0 }, e: { r: 1, c: 12 } }  
             ];
 
-            // Definisi garis tepi (Border Thin) abu-abu halus untuk tabel agar rapi
             const borderGarisTabel = {
                 top: { style: "thin", color: { rgb: "D3D3D3" } },
                 bottom: { style: "thin", color: { rgb: "D3D3D3" } },
@@ -334,47 +357,40 @@
                     const cell_address = { r: R, c: C };
                     const cell_ref = XLSX.utils.encode_cell(cell_address);
                     
-                    // Mengantisipasi sel kosong di area tabel agar border tetap tercetak utuh
                     if (!ws[cell_ref]) {
                         if (R >= 3) ws[cell_ref] = { t: 's', v: '' };
                         else continue;
                     }
                     if (!ws[cell_ref].s) ws[cell_ref].s = {};
 
-                    // A. Format Baris Judul 1 (Utama)
                     if (R === 0) {
                         ws[cell_ref].s.font = { name: "Segoe UI", size: 14, bold: true, color: { rgb: "0B6623" } };
                         ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
                         continue;
                     }
-                    // B. Format Baris Judul 2 (Tanggal)
                     if (R === 1) {
                         ws[cell_ref].s.font = { name: "Segoe UI", size: 11, italic: true, color: { rgb: "555555" } };
                         ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
                         continue;
                     }
-                    if (R === 2) continue; // Lewati baris spasi kosong
+                    if (R === 2) continue;
 
-                    // C. Format Header Kolom Tabel (Baris Index ke-3)
                     if (R === 3) {
                         ws[cell_ref].s.font = { name: "Segoe UI", size: 11, bold: true, color: { rgb: "FFFFFF" } };
-                        ws[cell_ref].s.fill = { type: "pattern", pattern: "solid", fgColor: { rgb: "0B6623" } }; // Latar Hijau BAZNAS
+                        ws[cell_ref].s.fill = { type: "pattern", pattern: "solid", fgColor: { rgb: "0B6623" } }; 
                         ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
                         ws[cell_ref].s.border = borderGarisTabel;
                     } 
-                    // D. Format Seluruh Baris Isi Data (Baris Index ke-4 ke atas)
                     else if (R >= 4) {
                         ws[cell_ref].s.font = { name: "Segoe UI", size: 10 };
                         ws[cell_ref].s.border = borderGarisTabel;
                         
-                        // Pengaturan Perataan Isi Tabel (Beberapa kolom center, sisanya left agar rapi)
                         if (C === 0 || C === 5 || C === 6 || C === 8) {
-                            ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" }; // No, Usia, No HP, Kategori
+                            ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
                         } else {
-                            ws[cell_ref].s.alignment = { horizontal: "left", vertical: "center" }; // Nama, Alamat, Sosmed, Kelurahan
+                            ws[cell_ref].s.alignment = { horizontal: "left", vertical: "center" };
                         }
 
-                        // Zebra Striping dekoratif: mewarnai baris selang-seling secara halus
                         if (R % 2 === 1) {
                             ws[cell_ref].s.fill = { type: "pattern", pattern: "solid", fgColor: { rgb: "F9F9F9" } };
                         }
@@ -382,10 +398,8 @@
                 }
             }
 
-            // Memaksa Excel bawaan untuk menampilkan Gridlines lembar kerja
             ws['!views'] = [{ showGridLines: true }];
 
-            // Otomatisasi pengaturan lebar kolom (Auto-fit) + padding 4 karakter agar teks tidak terpotong garis
             const colWidths = headerKolom.map((header, colIndex) => {
                 let maxLen = header.length;
                 for (let rowIndex = 4; rowIndex < rowsData.length; rowIndex++) {
