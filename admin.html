@@ -31,6 +31,11 @@
             .card-body { padding: 10px !important; }
             .table th, .table td { font-size: 0.85rem !important; padding: 8px 6px !important; }
             .badge { font-size: 0.75rem !important; }
+            
+            /* PERUBAHAN MOBILE: Menyesuaikan teks & ukuran kartu agar pas diisi 3 kolom sejajar */
+            .card-stat { border-left-width: 3px; padding: 8px 6px !important; }
+            .stat-title { font-size: 0.65rem !important; }
+            .stat-number { font-size: 1.25rem !important; }
         }
     </style>
 </head>
@@ -56,35 +61,35 @@
 
         <div id="mainContent" class="d-none">
             
-            <div class="row g-2 g-md-3 mb-4">
-                <div class="col-6 col-md-4">
+            <div class="row g-1 g-md-3 mb-4">
+                <div class="col-4 col-md-4">
                     <div class="card card-stat shadow-sm p-2 p-md-3 h-100">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h6 class="text-muted text-uppercase small mb-1" style="font-size: 0.75rem;">Total Daftar</h6>
-                                <h3 class="fw-bold mb-0 text-success fs-2" id="statTotal">0</h3>
+                                <h6 class="text-muted text-uppercase small mb-1 stat-title" style="font-size: 0.75rem;">Total Daftar</h6>
+                                <h3 class="fw-bold mb-0 text-success fs-2 stat-number" id="statTotal">0</h3>
                             </div>
                             <div class="fs-1 text-success d-none d-sm-block"><i class="fa-solid fa-users"></i></div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-4">
+                <div class="col-4 col-md-4">
                     <div class="card card-stat shadow-sm p-2 p-md-3 h-100 border-warning">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h6 class="text-muted text-uppercase small mb-1" style="font-size: 0.75rem;">UMKM Binaan</h6>
-                                <h3 class="fw-bold mb-0 text-warning fs-2" id="statUmkm">0</h3>
+                                <h6 class="text-muted text-uppercase small mb-1 stat-title" style="font-size: 0.75rem;">UMKM Binaan</h6>
+                                <h3 class="fw-bold mb-0 text-warning fs-2 stat-number" id="statUmkm">0</h3>
                             </div>
                             <div class="fs-1 text-warning d-none d-sm-block"><i class="fa-solid fa-store"></i></div>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-4">
+                <div class="col-4 col-md-4">
                     <div class="card card-stat shadow-sm p-2 p-md-3 h-100 border-zmart-merah">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <h6 class="text-muted text-uppercase small mb-1" style="font-size: 0.75rem;">ZMart</h6>
-                                <h3 class="fw-bold mb-0 text-zmart-merah fs-2" id="statZmart">0</h3>
+                                <h6 class="text-muted text-uppercase small mb-1 stat-title" style="font-size: 0.75rem;">ZMart</h6>
+                                <h3 class="fw-bold mb-0 text-zmart-merah fs-2 stat-number" id="statZmart">0</h3>
                             </div>
                             <div class="fs-1 text-zmart-merah d-none d-sm-block"><i class="fa-solid fa-shop"></i></div>
                         </div>
@@ -379,7 +384,7 @@
                         ws[cell_ref].s.font = { name: "Segoe UI", size: 11, bold: true, color: { rgb: "FFFFFF" } };
                         ws[cell_ref].s.fill = { type: "pattern", pattern: "solid", fgColor: { rgb: "0B6623" } }; 
                         ws[cell_ref].s.alignment = { horizontal: "center", vertical: "center" };
-                        ws[cell_ref].s.border = borderGarisTabel;
+                        ws[cell_ref].s.border = borderGabel = borderGarisTabel;
                     } 
                     else if (R >= 4) {
                         ws[cell_ref].s.font = { name: "Segoe UI", size: 10 };
